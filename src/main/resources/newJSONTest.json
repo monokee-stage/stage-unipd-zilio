@@ -1,0 +1,152 @@
+{"definitions": {
+    "xmlns:bpmndi": "http://www.omg.org/spec/BPMN/20100524/DI",
+    "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+    "xmlns": "http://www.omg.org/spec/BPMN/20100524/MODEL",
+    "process": {
+        "sequenceFlow": [
+            {
+                "targetRef": "check_if_first_trust",
+                "name": "flow1",
+                "id": "flow1",
+                "sourceRef": "policy_request"
+            },
+            {
+                "targetRef": "policy_request",
+                "name": "flow_start",
+                "id": "flow_start",
+                "sourceRef": "start"
+            },
+            {
+                "targetRef": "check_response",
+                "name": "flow3",
+                "id": "flow3",
+                "sourceRef": "test_console"
+            },
+            {
+                "targetRef": "test_console",
+                "name": "flow2",
+                "id": "flow2",
+                "sourceRef": "check_if_first_trust"
+            },
+            {
+                "targetRef": "success",
+                "conditionExpression": {
+                    "xsi:type": "tFormalExpression",
+                    "content": "${responseCheck.success == true}"
+                },
+                "name": "responseCheck_success",
+                "id": "responseCheck_success",
+                "sourceRef": "check_response"
+            },
+            {
+                "targetRef": "end_event_success",
+                "name": "flow_success",
+                "id": "flow_success",
+                "sourceRef": "success"
+            },
+            {
+                "targetRef": "failed",
+                "conditionExpression": {
+                    "xsi:type": "tFormalExpression",
+                    "content": "${responseCheck.success == false}"
+                },
+                "name": "responseCheck_failed",
+                "id": "responseCheck_failed",
+                "sourceRef": "check_response"
+            },
+            {
+                "targetRef": "end_event_failed",
+                "name": "flow_failed",
+                "id": "flow_failed",
+                "sourceRef": "failed"
+            }
+        ],
+        "scriptTask": {
+            "name": "test console",
+            "id": "test_console",
+            "scriptFormat": "javascript",
+            "flowable:autoStoreVariables": false,
+            "script": "java.lang.System.out.println(execution.getVariable(\"responseCheck\"));\n\nvar res_check = execution.getVariable(\"responseCheck\");\njava.lang.System.out.println(res_check);\n\nvar parsed = JSON.parse(res_check);\njava.lang.System.out.println(parsed.success);\n\njava.lang.System.out.println(\"JSON admins\");\njava.lang.System.out.println(\"1st json admin\");"
+        },
+        "endEvent": [
+            {
+                "name": "end_event_success",
+                "id": "end_event_success"
+            },
+            {
+                "name": "end_event_failed",
+                "id": "end_event_failed"
+            }
+        ],
+        "extensionElements": {"flowable:executionListener": {
+            "event": "end",
+            "class": "org.flowable.ProcessConfig"
+        }},
+        "serviceTask": {
+            "extensionElements": {"flowable:field": [
+                {
+                    "name": "requestMethod",
+                    "flowable:string": "GET"
+                },
+                {
+                    "name": "requestUrl",
+                    "flowable:string": "https://new.monokee.it/api/get_monokee_policy"
+                },
+                {
+                    "name": "responseVariableName",
+                    "flowable:string": "responseCheck"
+                },
+                {
+                    "name": "saveResponseVariableAsJson",
+                    "flowable:string": "true"
+                }
+            ]},
+            "name": "Recupero policy monokee",
+            "id": "check_if_first_trust",
+            "flowable:type": "http"
+        },
+        "exclusiveGateway": {
+            "name": "check_response",
+            "id": "check_response"
+        },
+        "startEvent": {
+            "flowable:formFieldValidation": true,
+            "name": "start",
+            "id": "start"
+        },
+        "documentation": "This flow represents domain trust. Start implementation of signal.",
+        "name": "Get monokee policy",
+        "id": "get_monokee_policy_http",
+        "isExecutable": true,
+        "userTask": [
+            {
+                "flowable:assignee": "$INITIATOR",
+                "flowable:formKey": "form-trust-domini-1",
+                "extensionElements": {"modeler:initiator-can-complete": {
+                    "xmlns:modeler": "http://flowable.org/modeler",
+                    "content": "true"
+                }},
+                "flowable:formFieldValidation": true,
+                "name": "Richiesta policy monokee",
+                "id": "policy_request"
+            },
+            {
+                "flowable:formFieldValidation": true,
+                "name": "success",
+                "id": "success"
+            },
+            {
+                "flowable:formFieldValidation": true,
+                "name": "failed",
+                "id": "failed"
+            }
+        ]
+    },
+    "xmlns:omgdc": "http://www.omg.org/spec/DD/20100524/DC",
+    "xmlns:flowable": "http://flowable.org/bpmn",
+    "targetNamespace": "JSONParser-bpmnModel",
+    "typeLanguage": "http://www.w3.org/2001/XMLSchema",
+    "expressionLanguage": "http://www.w3.org/1999/XPath",
+    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+    "xmlns:omgdi": "http://www.omg.org/spec/DD/20100524/DI"
+}}

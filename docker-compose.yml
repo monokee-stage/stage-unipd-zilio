@@ -1,0 +1,33 @@
+version: '3.4'
+services:
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: flowable
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+    command: --max_allowed_packet=32505856
+    hostname: mysql
+
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  flowable:
+    image: flowable/all-in-one
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    volumes:
+      - ./flowable-rest.war:/opt/tomcat/webapps/flowable-rest.war
+      - ./application.properties:/opt/tomcat/lib/config/application.properties
+      #- ./application.properties:/opt/tomcat/webapps/flowable-task/WEB-INF/classes/META-INF/flowable-ui-app/application.properties
+      - ./mysql-connector-java-8.0.21.jar:/opt/tomcat/lib/mysql-connector-java-8.0.21.jar
+      #- ./mysql-connector-java-8.0.21.jar:/opt/tomcat/webapps/flowable-task/WEB-INF/lib/mysql-connector-java-8.0.21.jar
+volumes:
+  mysql-data:
+    external:
+      name: mysql-data

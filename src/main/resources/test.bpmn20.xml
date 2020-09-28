@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="JSONParser-bpmnModel">
+  <process id="get_monokee_policy_http" name="Get monokee policy" isExecutable="true">
+    <documentation>This flow represents domain trust. Start implementation of signal.</documentation>
+    <extensionElements>
+      <flowable:executionListener event="end" class="org.flowable.ProcessConfig"></flowable:executionListener>
+    </extensionElements>
+    <startEvent id="start" name="start" flowable:formFieldValidation="true"></startEvent>
+    <userTask id="policy_request" name="Richiesta policy monokee" flowable:assignee="$INITIATOR" flowable:formKey="form-trust-domini-1" flowable:formFieldValidation="true">
+      <extensionElements>
+        <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[true]]></modeler:initiator-can-complete>
+      </extensionElements>
+    </userTask>
+    <serviceTask id="check_if_first_trust" name="Recupero policy monokee" flowable:type="http">
+      <extensionElements>
+        <flowable:field name="requestMethod">
+          <flowable:string><![CDATA[GET]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="requestUrl">
+          <flowable:string><![CDATA[https://new.monokee.it/api/get_monokee_policy]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="responseVariableName">
+          <flowable:string><![CDATA[responseCheck]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="saveResponseVariableAsJson">
+          <flowable:string><![CDATA[true]]></flowable:string>
+        </flowable:field>
+      </extensionElements>
+    </serviceTask>
+    <scriptTask id="test_console" name="test console" scriptFormat="javascript" flowable:autoStoreVariables="false">
+      <script><![CDATA[java.lang.System.out.println(execution.getVariable("responseCheck"));
+
+var res_check = execution.getVariable("responseCheck");
+java.lang.System.out.println(res_check);
+
+var parsed = JSON.parse(res_check);
+java.lang.System.out.println(parsed.success);
+
+java.lang.System.out.println("JSON admins");
+java.lang.System.out.println("1st json admin");]]></script>
+    </scriptTask>
+    <exclusiveGateway id="check_response" name="check_response"></exclusiveGateway>
+    <sequenceFlow id="flow1" name="flow1" sourceRef="policy_request" targetRef="check_if_first_trust"></sequenceFlow>
+    <sequenceFlow id="flow_start" name="flow_start" sourceRef="start" targetRef="policy_request"></sequenceFlow>
+    <sequenceFlow id="flow3" name="flow3" sourceRef="test_console" targetRef="check_response"></sequenceFlow>
+    <sequenceFlow id="flow2" name="flow2" sourceRef="check_if_first_trust" targetRef="test_console"></sequenceFlow>
+    <sequenceFlow id="responseCheck_failed" name="responseCheck_failed" sourceRef="check_response" targetRef="end_event_failed">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${responseCheck.success == false}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="end_event_success" name="end_event_success"></endEvent>
+    <endEvent id="end_event_failed" name="end_event_failed"></endEvent>
+    <sequenceFlow id="responseCheck_success" name="responseCheck_success" sourceRef="check_response" targetRef="end_event_success">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${responseCheck.success == true}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+</definitions>
