@@ -95,7 +95,7 @@ public class ProcessWithForms {
             int taskIndex = Integer.valueOf(scanner.nextLine());
             Task task = tasks.get(taskIndex - 1);
             Map<String, Object> processVariables = taskService.getVariables(task.getId());
-            System.out.println(processVariables.get("initiator") + " wants to complete this task and his choice is " + choice);
+            System.out.println(processVariables.get(initiator) + " wants to complete this task and his choice is " + choice);
 
             taskService.complete(task.getId(), variables);
         }

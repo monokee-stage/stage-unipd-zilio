@@ -126,7 +126,6 @@
         ],
         "serviceTask": [
             {
-                "flowable:async": true,
                 "extensionElements": {"flowable:field": [
                     {
                         "name": "to",

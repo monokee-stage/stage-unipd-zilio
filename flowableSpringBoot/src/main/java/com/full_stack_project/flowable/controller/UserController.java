@@ -4,10 +4,7 @@ import com.full_stack_project.flowable.modal.User;
 import com.full_stack_project.flowable.repository.UserRepository;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.TaskService;
+import org.flowable.engine.*;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -43,6 +40,7 @@ public class UserController {
 
    public void ProcessRequestAccess(String id) throws Exception {
         ParseFileJson parseFileJson = new ParseFileJson();
+        Process process = parseFileJson.getProcess();
         BpmnModel bpmnModel = parseFileJson.getBpmnModel();
 
         // DB configuration parameters
@@ -68,12 +66,12 @@ public class UserController {
                 .deploymentId(deployment.getId())
                 .singleResult();
 
-        //RuntimeService runtimeService = processEngine.getRuntimeService();
+        RuntimeService runtimeService = processEngine.getRuntimeService();
 
-        //runtimeService.startProcessInstanceByKey(processDefinition.getKey(), variables);
+        runtimeService.startProcessInstanceByKey(processDefinition.getKey());
 
         TaskService taskService = processEngine.getTaskService();
-        List<Task> tasks = taskService.createTaskQuery().taskCandidateOrAssigned(id).active().list();
+        List<Task> tasks = taskService.createTaskQuery().taskUnassigned().active().list();
 
         System.out.println("You have " + tasks.size() + " tasks:");
 

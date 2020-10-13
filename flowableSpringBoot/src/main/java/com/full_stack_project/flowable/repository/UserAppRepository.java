@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface UserAppRepository extends JpaRepository<AddAppToUser, String> {
-    String FIND_LAST = "SELECT id, value FROM ACT_ID_USER_APP where id != 'admin' ORDER BY id ASC LIMIT 1;";
+    String FIND_LAST = "SELECT user, value FROM ACT_ID_USER_APP where user != 'admin' ORDER BY user ASC LIMIT 1;";
 
     @Query(value = FIND_LAST, nativeQuery = true)
     AddAppToUser findLast();

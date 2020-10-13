@@ -40,9 +40,9 @@ public class AppController {
         Process(val, "admin");
     }
 
-    
-    public void requestNotValidated() throws Exception {
-        ProcessRequestNotValidated();
+
+    public void requestNotValidated(String id) throws Exception {
+        ProcessRequest(id);
     }
 
     @PostMapping("/addApp/{id}&{app}&{validation}")
@@ -121,6 +121,8 @@ public class AppController {
                 .singleResult();
 
         //RuntimeService runtimeService = processEngine.getRuntimeService();
+        //runtimeService.startProcessInstanceById(processDefinition.getKey());
+
 
         Scanner scanner = new Scanner(System.in);
        /* System.out.println("Username: ");
@@ -159,12 +161,13 @@ public class AppController {
             Task task = tasks.get(taskIndex - 1);
 
             taskService.complete(task.getId(), variables);
-            processEngine.close();
         }
+
     }
 
-    public void ProcessRequestNotValidated() throws Exception {
+    public void ProcessRequest(String id) throws Exception {
         ParseFileJson parseFileJson = new ParseFileJson();
+        Process process = parseFileJson.getProcess();
         BpmnModel bpmnModel = parseFileJson.getBpmnModel();
 
 
@@ -194,14 +197,14 @@ public class AppController {
         //RuntimeService runtimeService = processEngine.getRuntimeService();
 
         TaskService taskService = processEngine.getTaskService();
-        List<Task> tasks = taskService.createTaskQuery().taskCandidateOrAssigned("admin").active().list();
+        List<Task> tasks = taskService.createTaskQuery().taskCandidateOrAssigned(id).active().list();
 
         System.out.println("You have " + tasks.size() + " tasks:");
 
         for (int i = 0; i < tasks.size(); i++) {
             if (tasks.get(i).getAssignee() == null) {
-                taskService.setAssignee(tasks.get(i).getId(), "admin");
-                tasks.get(i).setAssignee("admin");
+                taskService.setAssignee(tasks.get(i).getId(), id);
+                tasks.get(i).setAssignee(id);
             }
             System.out.println((i + 1) + ") " + tasks.get(i).getName() + " assignee: " + tasks.get(i).getAssignee() +
                     " form key: " + tasks.get(i).getFormKey());

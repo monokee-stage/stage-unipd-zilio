@@ -22,7 +22,7 @@
 java.lang.System.out.println(get_choice);]]></script>
     </scriptTask>
     <exclusiveGateway id="choice_gateway"></exclusiveGateway>
-    <serviceTask id="send_mail" name="send mail to admin" flowable:async="true" flowable:type="mail">
+    <serviceTask id="send_mail" name="send mail to admin" flowable:type="mail">
       <extensionElements>
         <flowable:field name="to">
           <flowable:string><![CDATA[ziliodav97@gmail.com]]></flowable:string>
@@ -118,10 +118,10 @@ java.lang.System.out.println(val);]]></script>
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${optionVariable=='Yes'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow_no_admin_contron" name="no admin control" sourceRef="choice_gateway" targetRef="app_ok">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${var:get(chooseapp) == 'Github'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${chooseapp == 'Github'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow_admin_contron" name="admin control" sourceRef="choice_gateway" targetRef="send_mail">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${var:get(chooseapp) != 'Github'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${chooseapp != 'Github'}]]></conditionExpression>
     </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_requestAccess">
