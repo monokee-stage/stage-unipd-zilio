@@ -6,6 +6,10 @@ import ValidationRequest from "./ValidationRequest";
 import RequestAccess from "../pages/RequestAccess";
 import Registration from "../pages/Registration";
 
+let admin = null;
+let userPending = null;
+let appPending = null;
+
 class GetUserTask extends React.Component{
 
     state = {
@@ -13,8 +17,7 @@ class GetUserTask extends React.Component{
         task_name: null,
         hasRequiredAccess: false,
         valChoice: null,
-        appChoice: null,
-        userPending: null
+        appChoice: null
     }
 
     componentDidMount() {
@@ -48,13 +51,14 @@ class GetUserTask extends React.Component{
                 }
             }
         ).then(response => {
-            return response.json();
+                return response.json();
         }).then(data => {
-            //console.log(data.name_)
-            this.setState({found: true, task_name: data.name_});
+            console.log(data)
+            if(data !== null)
+                this.setState({found: true, task_name: data.name_});
         }).catch(error => {
-            console.log(error);
             this.setState({task_name: null})
+            console.log(error);
         });
 
     }
@@ -69,12 +73,11 @@ class GetUserTask extends React.Component{
         this.setState({
             appChoice: choice
         })
+        appPending = choice;
     }
 
     setUserPending = (user) => {
-        this.setState({
-            userPending: user
-        })
+        userPending = user;
     }
 
     hasRequiredAccess = (access) => {
@@ -92,8 +95,21 @@ class GetUserTask extends React.Component{
     }
 
     handleConfirmRequest = () => {
-        fetch("http://localhost:8081/api/request/" + `${this.props.user}`, {
+        fetch("http://localhost:8081/api/request/" + `${admin}` + "&" + `${userPending}`, {
                 method: "GET",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            }
+        ).then((response) => {
+            console.log(response)
+        });
+    }
+
+    addAppValidatedByAdmin = () => {
+        fetch("http://localhost:8081/api/addAppValidated/" + `${this.props.user}` + "&" + `${this.getLastUserChoice(this.props.user)}` + "&" + `${admin}`, {
+                method: "POST",
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
@@ -106,13 +122,19 @@ class GetUserTask extends React.Component{
 
     handleConfirmAppConnected = () => {
         this.handleConfirmRequest()
-        return (
-            <h3>Workflow ended!</h3>
-        )
+        this.addAppValidatedByAdmin()
+    }
+
+    setAdmin = (user) =>{
+        admin = user;
+        //console.log(this.props.user)
+        //console.log(admin)
     }
 
     renderTask = () => {
         if(this.state.task_name === "choose the application"){
+            this.setUserPending(this.props.user)
+            //console.log(userPending)
             return(
                 <div>
                     <ChooseApp
@@ -132,10 +154,15 @@ class GetUserTask extends React.Component{
             )
 
         } else if (this.state.task_name === "validation request"){
+            this.setAdmin(this.props.user)
+            //console.log(userPending)
             return(
                 <div>
+                    <p>{userPending} is requiring access to the following app: <strong>{appPending}</strong></p>
+                    <p>Do you want to validate the request?</p>
                     <ValidationRequest
                         validationChoice={this.setValChoice.bind(this)}
+                        user={admin}
                         onSignOut={this.props.onSignOut}
                     />
                 </div>
@@ -143,15 +170,15 @@ class GetUserTask extends React.Component{
         } else if (this.state.task_name === "request validated"){
             return(
                 <div>
-                    <p>Your request has been validated.</p>
+                    <p>The request has been validated.</p>
                     <input type="submit" value="Confirm" onClick={this.handleConfirmRequest.bind(this)}/>
                 </div>
             )
         } else if (this.state.task_name === "request not validated"){
             return (
                 <div>
-                    <p>Your request has not been validated.</p>
-                    <p>You will receive an email explaining the reason you didn't get the permissions.</p>
+                    <p>The request has not been validated.</p>
+                    <p>{userPending} will receive an email explaining the reason he didn't get the permissions.</p>
                     <input type="submit" value="Confirm" onClick={this.handleConfirmRequest.bind(this)}/>
                 </div>
             )

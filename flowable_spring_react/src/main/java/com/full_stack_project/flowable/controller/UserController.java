@@ -82,13 +82,22 @@ public class UserController {
             }
             System.out.println((i + 1) + ") " + tasks.get(i).getName() + " assignee: " + tasks.get(i).getAssignee() +
                     " form key: " + tasks.get(i).getFormKey());
-
+            /*
             Scanner scanner = new Scanner(System.in);
             System.out.println("Which task would you like to complete?");
             int taskIndex = Integer.valueOf(scanner.nextLine());
             Task task = tasks.get(taskIndex - 1);
-            taskService.complete(task.getId());
+            taskService.complete(task.getId());*/
+            taskService.complete(tasks.get(i).getId());
         }
-
+        //set the following tasks
+       taskService = processEngine.getTaskService();
+       tasks = taskService.createTaskQuery().taskUnassigned().active().list();
+       for (int i = 0; i < tasks.size(); i++) {
+           if (tasks.get(i).getAssignee() == null) {
+               taskService.setAssignee(tasks.get(i).getId(), id);
+               tasks.get(i).setAssignee(id);
+           }
+       }
     }
 }

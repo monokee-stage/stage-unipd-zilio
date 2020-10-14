@@ -34,15 +34,10 @@ public class AppController {
     @Autowired
     private InsertAppToUserRepository insertAppToUserRepository;
 
-    @GetMapping("/{val}")
-    public void validation(@PathVariable String val) throws Exception {
+    @GetMapping("/{val}&{user}")
+    public void validation(@PathVariable String val, @PathVariable String user) throws Exception {
         //System.out.println(val);
-        Process(val, "admin");
-    }
-
-
-    public void requestNotValidated(String id) throws Exception {
-        ProcessRequest(id);
+        Process(val, user);
     }
 
     @PostMapping("/addApp/{id}&{app}&{validation}")
@@ -156,16 +151,27 @@ public class AppController {
                     variables.put("optionVariable", value);
                 }
             }
-            System.out.println("Which task would you like to complete?");
+            /*System.out.println("Which task would you like to complete?");
             int taskIndex = Integer.valueOf(scanner.nextLine());
             Task task = tasks.get(taskIndex - 1);
 
-            taskService.complete(task.getId(), variables);
+            taskService.complete(task.getId(), variables);*/
+            taskService.complete(tasks.get(i).getId(), variables);
         }
 
+        taskService = processEngine.getTaskService();
+        tasks = taskService.createTaskQuery().taskUnassigned().active().list();
+        if(tasks.size() > 0) {
+            for (Task task : tasks) {
+                if (task.getAssignee() == null) {
+                    taskService.setAssignee(task.getId(), id);
+                    task.setAssignee(id);
+                }
+            }
+        }
     }
 
-    public void ProcessRequest(String id) throws Exception {
+    public void ProcessRequest(String id, String simpleUser) throws Exception {
         ParseFileJson parseFileJson = new ParseFileJson();
         Process process = parseFileJson.getProcess();
         BpmnModel bpmnModel = parseFileJson.getBpmnModel();
@@ -211,6 +217,17 @@ public class AppController {
 
             taskService.complete(tasks.get(i).getId());
         }
+        //set the following task to the user
+        taskService = processEngine.getTaskService();
+        tasks = taskService.createTaskQuery().taskUnassigned().active().list();
+        for (int i = 0; i < tasks.size(); i++) {
+            if (tasks.get(i).getAssignee() == null) {
+                taskService.setAssignee(tasks.get(i).getId(), simpleUser);
+                tasks.get(i).setAssignee(simpleUser);
+            }
+        }
     }
+
+
 
 }

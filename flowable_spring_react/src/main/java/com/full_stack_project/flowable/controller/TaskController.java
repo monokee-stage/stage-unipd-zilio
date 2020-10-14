@@ -23,10 +23,10 @@ public class TaskController {
         return taskRepository.findTaskNameByASSIGNEE_(assignee);
     }
 
-    @GetMapping("/request/{user}")
-    public void runRequest(@PathVariable String user) throws Exception {
-        Task t = getName(user);
+    @GetMapping("/request/{userAdmin}&{simpleUser}")
+    public void runRequest(@PathVariable String userAdmin, @PathVariable String simpleUser) throws Exception {
+        Task t = getName(userAdmin);
         AppController appController = new AppController();
-        appController.ProcessRequest(t.getASSIGNEE_());
+        appController.ProcessRequest(t.getASSIGNEE_(), simpleUser);
     }
 }

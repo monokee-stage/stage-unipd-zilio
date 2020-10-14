@@ -1,4 +1,5 @@
 import React from "react";
+import Registration from "../pages/Registration";
 
 class ValidationRequest extends React.Component{
 
@@ -16,7 +17,7 @@ class ValidationRequest extends React.Component{
         e.preventDefault()
         //console.log('You have selected:', this.state.selectedOption)
         this.props.validationChoice(this.state.selectedOption)
-        fetch("http://localhost:8081/api/" + `${this.state.selectedOption}`, {
+        fetch("http://localhost:8081/api/" + `${this.state.selectedOption}` + "&" + `${this.props.user}`, {
                 method: "GET",
                 headers: {
                     'Accept': 'application/json',
@@ -31,7 +32,6 @@ class ValidationRequest extends React.Component{
     render(){
         return (
             <div>
-                <p>Do you want to validate the request?</p>
                 <div>
                     <form onSubmit={this.handleFormSubmit.bind(this)}>
                         <div>

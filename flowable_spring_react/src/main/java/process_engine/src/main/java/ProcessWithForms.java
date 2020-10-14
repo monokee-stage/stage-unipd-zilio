@@ -13,6 +13,7 @@ import org.flowable.engine.impl.form.FormEngine;
 import org.flowable.engine.impl.form.JuelFormEngine;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormEngineConfigurationApi;
@@ -47,6 +48,7 @@ public class ProcessWithForms {
         ProcessEngine processEngine = cfg.buildProcessEngine();
 
         RepositoryService repositoryService = processEngine.getRepositoryService();
+
         Deployment deployment = repositoryService.createDeployment()
                 .addBpmnModel("test.bpmn20.xml", bpmnModel)
                 .deploy();
@@ -54,6 +56,8 @@ public class ProcessWithForms {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
                 .deploymentId(deployment.getId())
                 .singleResult();
+
+        System.out.println(processDefinition.getId());
 
         RuntimeService runtimeService = processEngine.getRuntimeService();
 

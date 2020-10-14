@@ -175,36 +175,30 @@ class ChooseApp extends Component {
             });
     }
 
-    checkApp = () => {
-        //console.log(this.state.userApps)
-        //console.log(this.state.userApps.includes(this.state.selectedApp))
-        if(this.state.userApps.includes(this.state.selectedApp)){
-            return (
-                <p style={{color: "red"}}>You've already added this application.</p>
-            )
-        } else {
-            this.props.choice(this.state.selectedApp) //set the prop
-            //check if the app needs the admin approval
-            this.checkIfNeedValidation(this.state.selectedApp)
-            this.getChoice(this.props.user)
-            //if it does not need, i'll just send the app to the DB table
-            if(this.state.needValidation === 0) {
-                this.sendAppToDB(this.state.selectedApp, 1) //app validated
-                return (
-                    <AppConfirmed />
-                )
-            }else{   //if it needs approval, i need the admin to approve this, so as long as the admin does not login, i can't do anything
-                if(this.state.selectedApp !== "Github")
-                    return (
-                        <WaitingAdminApproval />
-                    )
-                /*
-                (this.state.valChoice === 1) ?
-                    this.sendAppToDB(this.state.selectedApp, 1) //app validated
-                    :
-                    this.sendAppToDB(this.state.selectedApp, 0) //app NOT validated
-                    */
+    addAppValidated = () => {
+        fetch("http://localhost:8081/api/addAppValidated/" + `${this.props.user}` + "&" + `${this.state.selectedApp}` + "&" + "not_required", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
             }
+        ).then((response) => {
+            console.log(response)
+        });
+    }
+
+    checkApp = () => {
+        this.props.choice(this.state.selectedApp) //set the prop
+        //check if the app needs the admin approval
+        //console.log(this.state.needValidation)
+        //if it does not need, i'll just send the app to the DB table
+        if( this.checkIfNeedValidation === 0) {
+            this.sendAppToDB(this.state.selectedApp, 1)
+            this.addAppValidated() //app validated and i execute the process
+        }else{   //if it needs approval, i need the admin to approve this, so as long as the admin does not login, i can't do anything
+            this.sendAppToDB(this.state.selectedApp, 0)
+            this.getChoice(this.props.user) //waiting for admin approval but i execute the process anyways
         }
     }
 
@@ -232,8 +226,12 @@ class ChooseApp extends Component {
             })
     }
 
-    checkIfNeedValidation = (app) => {
-        fetch("http://localhost:8081/api/getIfNeedValidation/" + `${app}`, {
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        this.checkIfNeedValidation()
+    }
+
+    checkIfNeedValidation = () => {
+        fetch("http://localhost:8081/api/getIfNeedValidation/" + `${this.state.selectedApp}`, {
             method: "GET",
             headers: {
                 'Accept': 'application/json',
@@ -243,9 +241,9 @@ class ChooseApp extends Component {
             return response.json();
         }).then(data => {
             if(data === true) {
-                this.setState({needValidation: 1})
-            } else
-                this.setState({needValidation: 0})
+                this.state.needValidation = 1;
+                //this.setState({needValidation: 1})
+            }
         }).catch(error => {
             console.log(error);
         });
