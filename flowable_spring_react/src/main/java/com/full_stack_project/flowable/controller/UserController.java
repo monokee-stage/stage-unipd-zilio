@@ -27,9 +27,9 @@ public class UserController {
         return userRepository.findAll();
     }
 
-    @GetMapping("/user/{id}")
-    public Optional<User> getUser(@PathVariable String id) {
-        return userRepository.findById(id);
+    @GetMapping("/user/{id}&{pwd}")
+    public User getUser(@PathVariable String id, @PathVariable String pwd) {
+        return userRepository.findUserByIdPwd(id, pwd);
     }
 
     @PostMapping("/userRequiredAccess/{id}")

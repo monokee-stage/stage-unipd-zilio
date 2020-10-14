@@ -1,5 +1,4 @@
 import React from "react";
-import ChooseApp from "../pages/ChooseApp";
 import GetUserTask from "../task/GetUserTask";
 
 class SimpleUser extends React.Component{

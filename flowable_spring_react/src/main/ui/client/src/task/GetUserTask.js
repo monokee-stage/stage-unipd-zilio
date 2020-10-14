@@ -1,10 +1,7 @@
 import React from "react";
-import Axios from "axios";
 import ChooseApp from "../pages/ChooseApp";
-import AppConfirmed from "../pages/AppConfirmed";
 import ValidationRequest from "./ValidationRequest";
 import RequestAccess from "../pages/RequestAccess";
-import Registration from "../pages/Registration";
 
 let admin = null;
 let userPending = null;
@@ -127,8 +124,6 @@ class GetUserTask extends React.Component{
 
     setAdmin = (user) =>{
         admin = user;
-        //console.log(this.props.user)
-        //console.log(admin)
     }
 
     renderTask = () => {

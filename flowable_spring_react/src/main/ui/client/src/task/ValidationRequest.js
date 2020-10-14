@@ -1,5 +1,4 @@
 import React from "react";
-import Registration from "../pages/Registration";
 
 class ValidationRequest extends React.Component{
 
