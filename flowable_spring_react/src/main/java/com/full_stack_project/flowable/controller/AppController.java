@@ -25,8 +25,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/api")
 public class AppController {
-    public String value;
-
+    private String value;
     @Autowired
     private AppRepository appRepository;
     @Autowired
@@ -34,15 +33,15 @@ public class AppController {
     @Autowired
     private InsertAppToUserRepository insertAppToUserRepository;
 
-    @GetMapping("/{val}&{user}")
-    public void validation(@PathVariable String val, @PathVariable String user) throws Exception {
-        //System.out.println(val);
-        Process(val, user);
-    }
-
     @PostMapping("/addApp/{id}&{app}&{validation}")
     public void insertApp(@PathVariable String id, @PathVariable String app, @PathVariable int validation) {
         insertAppToUserRepository.insertWithQuery(new AddAppToUser(id, app, validation));
+    }
+
+    @GetMapping("/app/{val}&{user}")
+    public void validation(@PathVariable String val, @PathVariable String user) throws Exception {
+        //System.out.println(val);
+        Process(val, user);
     }
 
     @GetMapping("/appsName")
@@ -68,6 +67,13 @@ public class AppController {
         return appRepository.findUserApps(user).stream().reduce((first, second) -> second).orElse(null);
     }
 
+    @GetMapping("/getLastAppUserTest/{user}")
+    public void getLastAppTest(@PathVariable String user) throws Exception {
+        value = appRepository.getLastAppUserValue(user);
+        System.out.println(value);
+        Process(value, user);
+    }
+
     @GetMapping("/getIfNeedValidation/{name}")
     public boolean needValidation(@PathVariable String name) {
         if(appRepository.findIfNeedValidation(name) == 1)
@@ -87,6 +93,8 @@ public class AppController {
 
 
     public void Process(String value, String id) throws Exception {
+        System.out.println(value);
+
         ParseFileJson parseFileJson = new ParseFileJson();
         Process process = parseFileJson.getProcess();
         BpmnModel bpmnModel = parseFileJson.getBpmnModel();
@@ -161,12 +169,10 @@ public class AppController {
 
         taskService = processEngine.getTaskService();
         tasks = taskService.createTaskQuery().taskUnassigned().active().list();
-        if(tasks.size() > 0) {
-            for (Task task : tasks) {
-                if (task.getAssignee() == null) {
-                    taskService.setAssignee(task.getId(), id);
-                    task.setAssignee(id);
-                }
+        for (int i=0; i<tasks.size(); i++) {
+            if (tasks.get(i).getAssignee() == null) {
+                taskService.setAssignee(tasks.get(i).getId(), id);
+                tasks.get(i).setAssignee(id);
             }
         }
     }
@@ -175,7 +181,6 @@ public class AppController {
         ParseFileJson parseFileJson = new ParseFileJson();
         Process process = parseFileJson.getProcess();
         BpmnModel bpmnModel = parseFileJson.getBpmnModel();
-
 
         // DB configuration parameters
         ProcessEngineConfiguration cfg = new StandaloneProcessEngineConfiguration()
@@ -217,17 +222,66 @@ public class AppController {
 
             taskService.complete(tasks.get(i).getId());
         }
+
         //set the following task to the user
         taskService = processEngine.getTaskService();
         tasks = taskService.createTaskQuery().taskUnassigned().active().list();
-        for (int i = 0; i < tasks.size(); i++) {
+
+        for (int i=0; i<tasks.size(); i++) {
             if (tasks.get(i).getAssignee() == null) {
                 taskService.setAssignee(tasks.get(i).getId(), simpleUser);
                 tasks.get(i).setAssignee(simpleUser);
             }
         }
+
     }
 
 
+    public void ProcessRequestUser(String user) throws Exception {
+        ParseFileJson parseFileJson = new ParseFileJson();
+        Process process = parseFileJson.getProcess();
+        BpmnModel bpmnModel = parseFileJson.getBpmnModel();
 
+
+        // DB configuration parameters
+        ProcessEngineConfiguration cfg = new StandaloneProcessEngineConfiguration()
+                .setJdbcUrl("jdbc:mysql://mysql:3306/flowable?characterEncoding=UTF-8")
+                .setJdbcUsername("root")
+                .setJdbcPassword("root")
+                .setJdbcDriver("com.mysql.cj.jdbc.Driver")
+                .setMailServerHost("smtp.gmail.com")
+                .setMailServerUsername("atlearningteam@gmail.com")
+                .setMailServerPassword("plutobauco")
+                .setMailServerPort(587)
+                .setMailServerUseTLS(true)
+                .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+        ProcessEngine processEngine = cfg.buildProcessEngine();
+
+        RepositoryService repositoryService = processEngine.getRepositoryService();
+        Deployment deployment = repositoryService.createDeployment()
+                .addBpmnModel("test.bpmn20.xml", bpmnModel)
+                .deploy();
+
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                .deploymentId(deployment.getId())
+                .singleResult();
+
+        //RuntimeService runtimeService = processEngine.getRuntimeService();
+
+        TaskService taskService = processEngine.getTaskService();
+        List<Task> tasks = taskService.createTaskQuery().taskCandidateOrAssigned(user).active().list();
+
+        System.out.println("You have " + tasks.size() + " tasks:");
+
+        for (int i = 0; i < tasks.size(); i++) {
+            if (tasks.get(i).getAssignee() == null) {
+                taskService.setAssignee(tasks.get(i).getId(), user);
+                tasks.get(i).setAssignee(user);
+            }
+            System.out.println((i + 1) + ") " + tasks.get(i).getName() + " assignee: " + tasks.get(i).getAssignee() +
+                    " form key: " + tasks.get(i).getFormKey());
+
+            taskService.complete(tasks.get(i).getId());
+        }
+    }
 }

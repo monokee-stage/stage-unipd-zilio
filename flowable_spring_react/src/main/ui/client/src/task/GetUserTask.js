@@ -3,26 +3,32 @@ import ChooseApp from "../pages/ChooseApp";
 import ValidationRequest from "./ValidationRequest";
 import RequestAccess from "../pages/RequestAccess";
 
-let admin = null;
-let userPending = null;
-let appPending = null;
-
 class GetUserTask extends React.Component{
+
 
     state = {
         found: false,
         task_name: null,
         hasRequiredAccess: false,
         valChoice: null,
-        appChoice: null
+        appChoice: null,
+        admin: "",
+        userPending: "",
+        appPending: ""
     }
 
     componentDidMount() {
+        this.getUserTask(this.props.user) //get the tasks
+        this.getLastAdmin() //get the last admin
+    }
+
+    //update the tasks
+    componentDidUpdate(prevProps, prevState, snapshot) {
         this.getUserTask(this.props.user)
     }
 
-    getLastUserChoice = (id) => {
-        fetch("http://localhost:8081/api/getLastAppUserNoProcess/" + `${id}`, {
+    getLastUserChoice = () => {
+        fetch("http://localhost:8081/api/getLastUserApp", {
                 method: "GET",
                 headers: {
                     'Accept': 'application/json',
@@ -32,11 +38,10 @@ class GetUserTask extends React.Component{
         ).then(response => {
             return response.json();
         }).then(data => {
-            this.setState({appChoice: data.value})
+            this.setState({userPending: data.user, appPending: data.value})
         }).catch(error => {
             console.log(error);
         });
-        return this.state.appChoice
     }
 
     getUserTask = (user) => {
@@ -50,7 +55,6 @@ class GetUserTask extends React.Component{
         ).then(response => {
                 return response.json();
         }).then(data => {
-            console.log(data)
             if(data !== null)
                 this.setState({found: true, task_name: data.name_});
         }).catch(error => {
@@ -70,11 +74,11 @@ class GetUserTask extends React.Component{
         this.setState({
             appChoice: choice
         })
-        appPending = choice;
+        this.state.appPending = choice;
     }
 
     setUserPending = (user) => {
-        userPending = user;
+        this.state.userPending = user;
     }
 
     hasRequiredAccess = (access) => {
@@ -91,8 +95,10 @@ class GetUserTask extends React.Component{
         });
     }
 
+    //it manages admin tasks
     handleConfirmRequest = () => {
-        fetch("http://localhost:8081/api/request/" + `${admin}` + "&" + `${userPending}`, {
+        console.log(this.state.admin + " " + this.state.userPending)
+        fetch("http://localhost:8081/api/request/" + `${this.state.admin}` + "&" + `${this.state.userPending}`, {
                 method: "GET",
                 headers: {
                     'Accept': 'application/json',
@@ -103,9 +109,23 @@ class GetUserTask extends React.Component{
             console.log(response)
         });
     }
-
+/*
+    //last user task
+    handleEndUser = () => {
+        fetch("http://localhost:8081/api/request/onlyUser/" + `${this.state.userPending}`, {
+                method: "GET",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            }
+        ).then((response) => {
+            console.log(response)
+        });
+    }
+*/
     addAppValidatedByAdmin = () => {
-        fetch("http://localhost:8081/api/addAppValidated/" + `${this.props.user}` + "&" + `${this.getLastUserChoice(this.props.user)}` + "&" + `${admin}`, {
+        fetch("http://localhost:8081/api/addAppValidated/" + `${this.state.userPending}` + "&" + `${this.state.appPending}` + "&" + `${this.state.admin}`, {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json',
@@ -117,19 +137,47 @@ class GetUserTask extends React.Component{
         });
     }
 
+
     handleConfirmAppConnected = () => {
-        this.handleConfirmRequest()
+        //this.handleEndUser()
         this.addAppValidatedByAdmin()
     }
 
     setAdmin = (user) =>{
-        admin = user;
+        //this.state.admin = user;
+        fetch("http://localhost:8081/api/insertAdmin/" + `${user}`, {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            }
+        ).then((response) => {
+            console.log(response)
+        });
+    }
+
+    getLastAdmin = () => {
+        fetch("http://localhost:8081/api/getLastAdmin", {
+                method: "GET",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            }
+        ).then(response => {
+            return response.json();
+        }).then(data => {
+            console.log(data.username)
+            this.setState({ admin: data.username})
+        }).catch(error => {
+            console.log(error);
+        });
     }
 
     renderTask = () => {
         if(this.state.task_name === "choose the application"){
             this.setUserPending(this.props.user)
-            //console.log(userPending)
             return(
                 <div>
                     <ChooseApp
@@ -141,28 +189,29 @@ class GetUserTask extends React.Component{
                 </div>
             )
         } else if (this.state.task_name === "app connected"){
+            this.getLastUserChoice()
             return(
                 <div>
-                    <h4> You have access to the following application: {this.getLastUserChoice(this.props.user)} </h4>
+                    <h4> You have access to the following application: {this.state.appPending} </h4>
                     <input type="submit" value="Confirm" onClick={this.handleConfirmAppConnected.bind(this)}/>
                 </div>
             )
-
         } else if (this.state.task_name === "validation request"){
             this.setAdmin(this.props.user)
-            //console.log(userPending)
+            this.getLastUserChoice()
             return(
                 <div>
-                    <p>{userPending} is requiring access to the following app: <strong>{appPending}</strong></p>
+                    <p>{this.state.userPending} is requiring access to the following app: <strong>{this.state.appPending}</strong></p>
                     <p>Do you want to validate the request?</p>
                     <ValidationRequest
                         validationChoice={this.setValChoice.bind(this)}
-                        user={admin}
+                        user={this.state.admin}
                         onSignOut={this.props.onSignOut}
                     />
                 </div>
             )
         } else if (this.state.task_name === "request validated"){
+            this.getLastUserChoice()
             return(
                 <div>
                     <p>The request has been validated.</p>
@@ -170,10 +219,11 @@ class GetUserTask extends React.Component{
                 </div>
             )
         } else if (this.state.task_name === "request not validated"){
+            this.getLastUserChoice()
             return (
                 <div>
                     <p>The request has not been validated.</p>
-                    <p>{userPending} will receive an email explaining the reason he didn't get the permissions.</p>
+                    <p>{this.state.userPending} will receive an email explaining the reason he didn't get the permissions.</p>
                     <input type="submit" value="Confirm" onClick={this.handleConfirmRequest.bind(this)}/>
                 </div>
             )

@@ -34,6 +34,6 @@ public class AddAppValidatedController {
     public void insertAppValidated(@PathVariable String username, @PathVariable String app_name, @PathVariable String validator) throws Exception {
         addAppValidatedRepository.insertWithQueryToAppValidated(new AddAppValidated(username, app_name, validator));
         AppController appController = new AppController();
-        appController.Process(app_name, username);
+        appController.ProcessRequest(username, null);
     }
 }

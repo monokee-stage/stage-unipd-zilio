@@ -16,7 +16,7 @@ class ValidationRequest extends React.Component{
         e.preventDefault()
         //console.log('You have selected:', this.state.selectedOption)
         this.props.validationChoice(this.state.selectedOption)
-        fetch("http://localhost:8081/api/" + `${this.state.selectedOption}` + "&" + `${this.props.user}`, {
+        fetch("http://localhost:8081/api/app/" + `${this.state.selectedOption}` + "&" + `${this.props.user}`, {
                 method: "GET",
                 headers: {
                     'Accept': 'application/json',

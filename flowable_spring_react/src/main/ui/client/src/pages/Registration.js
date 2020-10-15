@@ -44,23 +44,12 @@ class Registration extends Component {
   }
 
   onSignOut = () => {
-    this.setUsername("")
-    this.setPassword("")
-    this.setApp("")
-    this.setIsAdmin("")
+    this.setUsername(null)
+    this.setPassword(null)
+    this.setApp(null)
+    this.setIsAdmin(false)
     window.location.reload();
   }
-  /*
-      useEffect = (user) => {
-          fetch(
-              "http://localhost:8081/api/user/" + `${user}`
-          )
-              .then(response => {
-                  if (response.data.loggedIn === true) {
-                      this.setLoginStatus(response.data.user[0].username);
-                  }
-              })
-      }*/
 
   login = (username, password) => {
     fetch("http://localhost:8081/api/user/" + `${username}` + "&" + `${password}`, {

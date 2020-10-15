@@ -26,7 +26,14 @@ public class TaskController {
     @GetMapping("/request/{userAdmin}&{simpleUser}")
     public void runRequest(@PathVariable String userAdmin, @PathVariable String simpleUser) throws Exception {
         Task t = getName(userAdmin);
+        System.out.println(t.getASSIGNEE_());
         AppController appController = new AppController();
         appController.ProcessRequest(t.getASSIGNEE_(), simpleUser);
+    }
+
+    @GetMapping("/request/onlyUser/{user}")
+    public void runRequestUser(@PathVariable String user) throws Exception{
+        AppController appController = new AppController();
+        appController.ProcessRequestUser(user);
     }
 }
