@@ -468,8 +468,13 @@ public class ParseFileJson extends ProcessConfig {
             List<FormProperty> properties = getUserTaskFormProperty(ee);
             userTask.setFormProperties(properties);
             if(ee.containsKey("flowable:taskListener")) {
-                JSONArray tasks = (JSONArray) ee.get("flowable:taskListener");
-                userTask.setTaskListeners(setUserTaskTaskListener(tasks));
+                if(ee.get("flowable:taskListener").getClass().toString().equals("class org.json.simple.JSONArray")){
+                    JSONArray tasks = (JSONArray) ee.get("flowable:taskListener");
+                    userTask.setTaskListeners(setUserTaskTaskListener(tasks));
+                } else {
+                    JSONObject tasks = (JSONObject) ee.get("flowable:taskListener");
+                    userTask.setTaskListeners(setUserTaskTaskListener(tasks));
+                }
             }
         }
         if(utO.containsKey("flowable:formFieldValidation"))
@@ -495,6 +500,16 @@ public class ParseFileJson extends ProcessConfig {
             JSONObject utAttributes = (JSONObject) utA.get(i);
             setUserTaskAttributes(utAttributes);
         }
+    }
+
+    public List<FlowableListener> setUserTaskTaskListener(JSONObject tl){
+        List<FlowableListener> list = new ArrayList<>();
+        FlowableListener flowableListener = new FlowableListener();
+        flowableListener.setEvent(tl.get("event").toString());
+        flowableListener.setImplementationType("class");
+        flowableListener.setImplementation(tl.get("class").toString());
+        list.add(flowableListener);
+        return list;
     }
 
     public List<FlowableListener> setUserTaskTaskListener(JSONArray tl){

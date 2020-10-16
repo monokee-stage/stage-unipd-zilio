@@ -2,23 +2,11 @@ package process_engine.src.main.java;
 
 import com.full_stack_project.flowable.controller.AppController;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.FormProperty;
 import org.flowable.bpmn.model.Process;
-import org.flowable.common.engine.impl.EngineConfigurator;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.*;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.flowable.engine.impl.cmd.CompleteTaskWithFormCmd;
-import org.flowable.engine.impl.form.FormEngine;
-import org.flowable.engine.impl.form.JuelFormEngine;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.repository.ProcessDefinitionQuery;
-import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.form.api.FormDefinition;
-import org.flowable.form.api.FormEngineConfigurationApi;
-import org.flowable.form.api.FormManagementService;
-import org.flowable.form.api.FormRepositoryService;
 import org.flowable.task.api.Task;
 
 import java.util.HashMap;
@@ -95,6 +83,7 @@ public class ProcessWithForms {
                     variables.put("optionVariable", choice);
                 }
             }
+
             System.out.println("Which task would you like to complete?");
             int taskIndex = Integer.valueOf(scanner.nextLine());
             Task task = tasks.get(taskIndex - 1);
