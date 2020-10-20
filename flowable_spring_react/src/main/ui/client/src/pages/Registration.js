@@ -10,20 +10,25 @@ class Registration extends Component {
     username: "",
     password: "",
     app: "",
+    loginOk: false,
     admin: false
   }
 
-  componentDidMount() {
-    fetch("http://localhost:8081/api/users", {
-          method: "GET",
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
+  getUsers = () => {
+      fetch("http://localhost:8081/api/users", {
+              method: "GET",
+              headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+              }
           }
-        }
-    ).then((response) => {
-      console.log(response)
-    });
+      ).then((response) => {
+          console.log(response)
+      });
+  }
+
+  componentDidMount() {
+      this.getUsers()
   }
 
   setUsername = (username) => {
@@ -43,10 +48,15 @@ class Registration extends Component {
     this.state.app = app;
   }
 
+  setLoginOk = (loginOk) => {
+    this.state.loginOk = loginOk;
+  }
+
   onSignOut = () => {
     this.setUsername(null)
     this.setPassword(null)
     this.setApp(null)
+    this.setLoginOk(false)
     this.setIsAdmin(false)
     window.location.reload();
   }
@@ -63,20 +73,64 @@ class Registration extends Component {
           return response.json();
         })
         .then(data => {
-          this.setState({
-            username: data.id_,
-            password: data.pwd_
-          });
-          if(data.id_ === "admin")
+          if (data)
+            this.setState({
+              username: data.id_,
+              password: data.pwd_,
+              loginOk: true
+            });
+          if (data.id_ === "admin")
             this.setState({admin: true})
         })
         .catch(error => {
-          console.log(error);
+          console.log(error)
+          this.setState({username: null, password: null, admin: false, loginOk: false})
         });
   }
 
   handleLogin = () => {
     this.login(this.state.username, this.state.password)
+  }
+
+  checkCombination = () => {
+    console.log(this.state.loginOk)
+    console.log(this.state.username)
+
+    if (this.state.loginOk === true && this.state.username !== null) {
+      if (this.state.admin === true) {
+        return (
+            <div>
+              <h1>{this.state.username}</h1>
+              <Admin
+                  user={this.state.username}
+                  isAdmin={this.state.admin}
+                  onSignOut={this.onSignOut}
+                  choice={this.setApp.bind(this)}
+                  app={this.state.app}/>
+            </div>
+        )
+      } else {
+        return (
+            <div>
+              <h1>{this.state.username}</h1>
+              <SimpleUser
+                  user={this.state.username}
+                  isAdmin={this.state.admin}
+                  onSignOut={this.onSignOut}
+                  choice={this.setApp.bind(this)}
+                  app={this.state.app} />
+            </div>
+        )
+      }
+    } else if(this.state.loginOk === true && this.state.username === null) {
+        return (
+            <div/>
+        )
+    } else if(this.state.loginOk === false && this.state.username === null) {
+        return (
+            <h2>Wrong username/password combination!</h2>
+        )
+    }
   }
 
   render() {
@@ -100,35 +154,8 @@ class Registration extends Component {
                   }}
               />
               <button onClick={this.handleLogin.bind(this)}> Login </button>
-              <h1>{this.state.username}</h1>
+              {this.checkCombination()}
             </div>
-            {
-              (this.state.username) ?
-                  <div>
-                    {
-                      (this.state.admin === true) ?
-                          <div>
-                            <Admin
-                                user={this.state.username}
-                                isAdmin={this.state.admin}
-                                onSignOut={this.onSignOut}
-                                choice={this.setApp.bind(this)}
-                                app={this.state.app} />
-                          </div>
-                          :
-                          <div>
-                            <SimpleUser
-                                user={this.state.username}
-                                isAdmin={this.state.admin}
-                                onSignOut={this.onSignOut}
-                                choice={this.setApp.bind(this)}
-                                app={this.state.app} />
-                          </div>
-                    }
-                  </div>
-                  :
-                  null
-            }
           </div>
         </div>
     );
@@ -136,106 +163,3 @@ class Registration extends Component {
 }
 
 export default Registration;
-/*
-import React, { useEffect, useState } from "react";
-import Axios from "axios";
-import "../App.css";
-import SimpleUser from "../components/SimpleUser";
-import Admin from "../components/Admin";
-import ApiService from "../components/ApiService";
-
-export default function Registration() {
-
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [app, setApp] = useState("");
-
-  const [admin, setAdmin] = useState("");
-
-  const [loginStatus, setLoginStatus] = useState("");
-
-  Axios.defaults.withCredentials = true;
-/*
-  const login = () => {
-    Axios.post("http://localhost:3001/login", {
-      username: username,
-      password: password,
-    }).then((response) => {
-      if (response.data.message) {
-        setLoginStatus(response.data.message);
-      } else {
-        setLoginStatus(response.data[0].ID_);
-        if(response.data[0].REV_ === 1)
-          setAdmin("true")
-        else if(response.data[0].REV_ === 2)
-          setAdmin("false")
-      }
-    });
-  };
-
-
-
-  useEffect(() => {
-    Axios.get("http://localhost:3001/login").then((response) => {
-      if (response.data.loggedIn === true) {
-        setLoginStatus(response.data.user[0].username);
-      }
-    });
-  }, []);
-
-  const signOut = () => {
-    setLoginStatus(null)
-    setApp("")
-  }
-
-  return (
-      <div className="App">
-        <div className="login">
-          <h1>Login</h1>
-          <input
-              type="text"
-              placeholder="Username..."
-              onChange={(e) => {
-                setUsername(e.target.value);
-              }}
-          />
-          <input
-              type="password"
-              placeholder="Password..."
-              onChange={(e) => {
-                setPassword(e.target.value);
-              }}
-          />
-          <button onClick={login}> Login </button>
-          <h1>{loginStatus}</h1>
-        </div>
-        {
-          (loginStatus === username) ?
-              <div>
-                {
-                  (admin === "true") ?
-                      <div>
-                        <Admin
-                            user={loginStatus}
-                            isAdmin={admin}
-                            onSignOut={signOut}
-                            choice={setApp.bind(this)}
-                            app={app} />
-                      </div>
-                      :
-                      <div>
-                        <SimpleUser
-                            user={loginStatus}
-                            isAdmin={admin}
-                            onSignOut={signOut}
-                            choice={setApp.bind(this)}
-                            app={app} />
-                      </div>
-                }
-              </div>
-              :
-              null
-        }
-      </div>
-  );
-}*/

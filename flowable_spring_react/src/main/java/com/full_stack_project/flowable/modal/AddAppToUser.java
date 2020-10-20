@@ -1,5 +1,7 @@
 package com.full_stack_project.flowable.modal;
 
+import com.thoughtworks.qdox.model.expression.Add;
+
 import javax.persistence.*;
 
 @Entity
@@ -15,6 +17,11 @@ public class AddAppToUser {
     private int validated;
 
     public AddAppToUser(){}
+
+    public AddAppToUser(String user, String value){
+        this.user = user;
+        this.value = value;
+    }
 
     public AddAppToUser(String user, String value, int validated) {
         this.user = user;

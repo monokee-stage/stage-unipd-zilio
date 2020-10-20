@@ -34,4 +34,13 @@ public class InsertAppToUserRepository {
     public void insertWithEntityManager(AddAppToUser addAppToUser) {
         this.entityManager.persist(addAppToUser);
     }
+
+    @Transactional
+    public void deleteRow(AddAppToUser addAppToUser){
+        entityManager.createNativeQuery("DELETE FROM ACT_ID_USER_APP WHERE user = ? AND value = ? AND validated = ?")
+                .setParameter(1, addAppToUser.getUser())
+                .setParameter(2, addAppToUser.getValue())
+                .setParameter(3, addAppToUser.getValidation())
+                .executeUpdate();
+    }
 }

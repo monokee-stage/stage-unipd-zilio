@@ -10,11 +10,6 @@
                 "sourceRef": "start"
             },
             {
-                "targetRef": "validation_request",
-                "id": "sid-E0F98E4D-6592-4533-9D3C-D9CE6027449A",
-                "sourceRef": "send_mail"
-            },
-            {
                 "targetRef": "end",
                 "id": "sid-21DD34FA-7D8E-4A98-96E3-22F70E2724F7",
                 "sourceRef": "send_mail_to_user"
@@ -80,6 +75,16 @@
                 "sourceRef": "sid-3249DA66-879F-4263-8139-EE2D7BD21A32"
             },
             {
+                "targetRef": "send_mail",
+                "conditionExpression": {
+                    "xsi:type": "tFormalExpression",
+                    "content": "${var:get(chooseapp) != 'Github'}"
+                },
+                "name": "admin control",
+                "id": "flow_admin_contron",
+                "sourceRef": "choice_gateway"
+            },
+            {
                 "targetRef": "app_ok",
                 "conditionExpression": {
                     "xsi:type": "tFormalExpression",
@@ -90,14 +95,9 @@
                 "sourceRef": "choice_gateway"
             },
             {
-                "targetRef": "send_mail",
-                "conditionExpression": {
-                    "xsi:type": "tFormalExpression",
-                    "content": "${var:get(chooseapp) != 'Github'}"
-                },
-                "name": "admin control",
-                "id": "flow_admin_contron",
-                "sourceRef": "choice_gateway"
+                "targetRef": "validation_request",
+                "id": "sid-9CF3718E-ECBD-49CE-8743-3074EC2D45E9",
+                "sourceRef": "send_mail"
             }
         ],
         "scriptTask": [
@@ -722,7 +722,7 @@
                     "id": "BPMNEdge_flow_val_false"
                 },
                 {
-                    "bpmnElement": "sid-E0F98E4D-6592-4533-9D3C-D9CE6027449A",
+                    "bpmnElement": "sid-9CF3718E-ECBD-49CE-8743-3074EC2D45E9",
                     "omgdi:waypoint": [
                         {
                             "x": 695,
@@ -733,7 +733,7 @@
                             "y": 330
                         }
                     ],
-                    "id": "BPMNEdge_sid-E0F98E4D-6592-4533-9D3C-D9CE6027449A"
+                    "id": "BPMNEdge_sid-9CF3718E-ECBD-49CE-8743-3074EC2D45E9"
                 }
             ]
         }
