@@ -5,12 +5,14 @@ class RequestAccess extends Component{
     handleSubmit = () => {
         console.log(this.props.user + " required access")
         this.props.hasRequiredAccess(true);
+        alert("Task executed")
+        window.location.reload()
     }
 
     render() {
         return (
-            <div>
-                <input type="submit" value="Request access" onClick={this.handleSubmit}/>
+            <div className="requestAccess">
+                <input type="submit" id="requestAccessBtn" value="Request access" onClick={this.handleSubmit}/>
             </div>
         )
     }

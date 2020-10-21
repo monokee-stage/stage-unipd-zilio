@@ -1,6 +1,8 @@
 package com.full_stack_project.flowable.repository;
 
 import com.full_stack_project.flowable.modal.AddAppToUser;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

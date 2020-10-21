@@ -2,14 +2,95 @@
   text-align: center;
 }
 
-.registration, .login {
+.registration, .login{
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-input {
+.validationRequest{
+  box-sizing: content-box;
+  width: 500px;
+  border: solid medium black;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-inline: 30px;
+}
+
+.validationRequestTask, .requestAccess, .chooseApplication {
+  box-sizing: content-box;
+  width: 500px;
+  border: solid medium black;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#selectApp {
+  width: 200px;
+  margin-top: 30px;
+  border: solid thin;
+}
+
+.appChoice {
+  box-sizing: content-box;
+  border-top: solid medium black;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 500px;
+}
+
+.inputYes {
+  width: 15px;
+}
+
+.inputNo {
+  width: 20px;
+  margin-left: 0;
+  margin-right: 1px;
+}
+
+#valChoices {
+  display: flow;
+}
+
+#confirmValidationBtn, #signOutBtn, #requestAccessBtn {
+  margin-bottom: 10px;
+  margin-top: 10px;
+  width: 200px;
+  height: 40px;
+}
+
+#username {
+  margin-bottom: 10px;
   width: 250px;
   height: 40px;
+}
+
+#password {
+  margin-bottom: 10px;
+  width: 250px;
+  height: 40px;
+}
+
+#loginBtn {
+  margin-top: auto;
+  width: 200px;
+  height: 40px;
+}
+
+#formRadioButtons {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 250px;
+  height: 40px;
+  margin-bottom: 15px;
 }

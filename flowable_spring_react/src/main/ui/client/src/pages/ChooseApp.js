@@ -4,6 +4,12 @@ const {Component} = require("react");
 
 class ChooseApp extends Component {
 
+    constructor(props) {
+        console.log("costruttore ChooseApp")
+        super(props);
+        this.getApps()
+    }
+
     state = {
         apps: [],
         selectedApp: "",
@@ -13,41 +19,33 @@ class ChooseApp extends Component {
         valChoice: ""
     };
 
-
     getApps = () => {
-        fetch(
-            "http://localhost:8081/api/appsName"
+        fetch("http://localhost:8081/api/appsName"
         ).then(response => {
             return response.json();
         }).then(data => {
-            this.state.apps = data
-            /*for (let key in data) {
+            //this.state.apps = data
+            for (let key in data) {
                 if (Object.prototype.hasOwnProperty.call(data, key)) {
                     let val = data[key];
                     this.state.apps.push({name: val.name})
                 }
-            }*/
+            }
+            this.forceUpdate()
         }).catch(error => {
             console.log(error);
         });
     }
 
-    componentDidMount() {
-        this.getApps()
+    handleChoice(e) {
+        e.preventDefault()
+        this.checkApp()
+        /*alert("Task executed.")
+        window.location.reload()*/
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         this.checkIfNeedValidation()
-    }
-
-    handleSignOut(e) {
-        e.preventDefault()
-        this.props.onSignOut()
-    }
-
-    handleChoice(e) {
-        e.preventDefault()
-        this.checkApp()
     }
 
     /*
@@ -84,7 +82,7 @@ class ChooseApp extends Component {
     checkApp = () => {
         this.props.choice(this.state.selectedApp) //set the prop
         //check if the app needs the admin approval
-        console.log(this.state.needValidation)
+        console.log(this.state.selectedApp + " " + this.state.needValidation)
         //if it does not need, i'll just send the app to the DB table
         if(this.state.needValidation === 0) {
             console.log("sono nell'if")
@@ -94,6 +92,7 @@ class ChooseApp extends Component {
             this.sendAppToDB(this.state.selectedApp, 0)
              //waiting for admin approval but i execute the process anyways
         }
+        console.log("sono fuori dal controllo if-else")
         //this.forceUpdate()
         this.getChoice(this.props.user)
     }
@@ -154,17 +153,20 @@ class ChooseApp extends Component {
         });
     }
 
+    changeSelectedOption = (e) => {
+        this.setState({
+            selectedApp: e.target.value
+        })
+    }
+
     render() {
         return (
-            <div>
+            <div className="appChoice">
                 <form onSubmit={this.handleChoice.bind(this)}>
                     <select
+                        id="selectApp"
                         value={this.state.selectedApp}
-                        onChange={e =>
-                            this.setState({
-                                selectedApp: e.target.value
-                            })
-                        }
+                        onChange={this.changeSelectedOption.bind(this)}
                     >
                         {this.state.apps.map(app => (
                             <option
@@ -176,7 +178,7 @@ class ChooseApp extends Component {
                         ))}
                     </select>
                     <p>
-                        <input type="submit" value="Confirm"/>
+                        <input type="submit" id="confirmValidationBtn" value="Confirm"/>
                     </p>
                 </form>
                 <div

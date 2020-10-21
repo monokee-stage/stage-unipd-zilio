@@ -15,6 +15,8 @@ import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.task.api.Task;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import process_engine.src.main.java.ParseFileJson;
@@ -80,9 +82,10 @@ public class AppController {
     }
 
     @GetMapping("/getLastAppUser/{user}")
-    public AppNameUserOnly getLastApp(@PathVariable String user) throws Exception {
+    public AppNameUserOnly getLastApp(@PathVariable String user) throws NullPointerException {
         value = Objects.requireNonNull(appRepository.findUserApps(user).stream().reduce((first, second) -> second).orElse(null)).getValue();
-        Process(value, user);
+        System.out.println(value);
+        //Process(value, user);
         return appRepository.findUserApps(user).stream().reduce((first, second) -> second).orElse(null);
     }
 

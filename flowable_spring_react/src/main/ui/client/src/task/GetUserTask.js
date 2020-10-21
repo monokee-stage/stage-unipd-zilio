@@ -4,6 +4,10 @@ import RequestAccess from "../pages/RequestAccess";
 
 class GetUserTask extends React.Component{
 
+    constructor(props) {
+        super(props);
+        this.getAllRequest()
+    }
 
     state = {
         found: false,
@@ -20,10 +24,9 @@ class GetUserTask extends React.Component{
     }
 
     componentDidMount() {
+        this.n_request()
         this.getUserTask(this.props.user)
         this.getLastAdmin() //get the last admin
-        this.getAllRequest()
-        this.n_request()
     }
 
     getLastUserChoice = () => {
@@ -55,16 +58,13 @@ class GetUserTask extends React.Component{
                 return response.json();
         }).then(data => {
             if(data !== null) {
-                if(data !== this.state.task) {
-                    this.state.found = true;
-                    for (let key in data) {
-                        if (Object.prototype.hasOwnProperty.call(data, key)) {
-                            let val = data[key];
-                            this.state.task.push({id: val.id_, name: val.name_, assignee: val.assignee_})
-                        }
+                for (let key in data) {
+                    if (Object.prototype.hasOwnProperty.call(data, key)) {
+                        let val = data[key];
+                        this.state.task.push({id: val.id_, name: val.name_, assignee: val.assignee_})
                     }
-                } else
-                    this.state.found = true
+                    this.setState({ found: true})
+                }
             }
         }).catch(error => {
             console.log(error);
@@ -111,16 +111,18 @@ class GetUserTask extends React.Component{
         }
 
         //for(let i=0; i<this.state.request_user.length; i++) {
-            fetch("http://localhost:8081/api/request/" + `${this.state.admin}` + "&" + `${users}`, {
-                    method: "GET",
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                    }
+        fetch("http://localhost:8081/api/request/" + `${this.state.admin}` + "&" + `${users}`, {
+                method: "GET",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
                 }
-            ).then((response) => {
-                console.log(response)
-            });
+            }
+        ).then((response) => {
+            console.log(response)
+        });
+        alert("Task executed.")
+        window.location.reload()
         //}
     }
 /*
@@ -183,6 +185,8 @@ class GetUserTask extends React.Component{
         //this.handleEndUser()
         this.addAppValidatedByAdmin()
         this.deleteRowTable()
+        alert("Task executed.")
+        window.location.reload()
     }
 
     //get all request from DB: ACT_ID_USER_APP
@@ -203,8 +207,6 @@ class GetUserTask extends React.Component{
                     this.state.request_user.push({user: val.user, app: val.value})
                 }
             }
-            for(let i=0; i<this.state.request_user.length; i++)
-                console.log(this.state.request_user[i].user + " " + this.state.request_user[i].app)
         }).catch(error => {
             console.log(error);
         });
@@ -301,16 +303,19 @@ class GetUserTask extends React.Component{
         ).then((response) => {
             console.log(response)
         });
+        alert("Task executed.")
+        window.location.reload()
     }
 
     renderTask = () => {
+        console.log(this.state.task)
         const vectorRender = []
         if(this.props.isAdmin === false) {
             for (let i = 0; i < this.state.task.length; i++) {
                 if (this.state.task[i].name === "choose the application") {
                     this.setUserPending(this.props.user)
                     vectorRender.push(
-                        <div>
+                        <div className="chooseApplication">
                             <h3>{this.state.task[i].name}</h3>
                             <ChooseApp
                                 user={this.props.user}
@@ -339,56 +344,58 @@ class GetUserTask extends React.Component{
             }
         }else {
             if (this.state.n_request > 0) {
-                for (let i = 0; i < this.state.n_request; i++) {
+                for (let i = 0; i < this.state.task.length; i++) {
                     console.log(this.state.task[i].name)
                     if (this.state.task[i].name === "validation request") {
                         vectorRender.push(
-                            <div>
+                            <div className="validationRequest">
                                 <h3>{this.state.task[i].name}</h3>
                                 {this.state.request_user.map((user, i) =>
-                                    <div>
+                                    <div className="validationRequestTask">
                                         <p><strong>{user.user}</strong> is requiring access to the following app: <strong>{user.app}</strong></p>
                                         <p>Do you validate the request?</p>
 
                                         <form id="formRadioButtons">
-                                            <div>
-                                                <input accessKey={i} name={user.app} type="radio" id={user.user} value="Yes" checked={this.state.changeStateRadioButton[i] === 'Yes'} onChange={this.handleOptionChange.bind(this)}/>
-                                                <label htmlFor="yes">Yes</label>
-                                            </div>
-                                            <div>
-                                                <input accessKey={i} name={user.app} type="radio" id={user.user} value="No" checked={this.state.changeStateRadioButton[i] === 'No'} onChange={this.handleOptionChange.bind(this)}/>
-                                                <label htmlFor="no">No</label>
+                                            <div id="valChoices">
+                                                <input className="inputYes" accessKey={i} name={user.app} type="radio" id={user.user} value="Yes" checked={this.state.changeStateRadioButton[i] === 'Yes'} onChange={this.handleOptionChange.bind(this)}/>
+                                                <label id="forYes" htmlFor="yes">Yes</label>
+                                                <br/>
+                                                <input className="inputNo" accessKey={i} name={user.app} type="radio" id={user.user} value="No" checked={this.state.changeStateRadioButton[i] === 'No'} onChange={this.handleOptionChange.bind(this)}/>
+                                                <label id="forNo" htmlFor="no">No</label>
                                             </div><br/>
                                         </form>
                                     </div>
                                 )}
-                                <input type="submit" value="Confirm" onClick={this.handleFormSubmit.bind(this)}/>
+                                <input type="submit" id="confirmValidationBtn" value="Confirm" onClick={this.handleFormSubmit.bind(this)}/>
                             </div>)
-                    } else if (this.state.task[i].name === "request validated") {
+                    } else {
+                        if (this.state.task[i].name === "request validated") {
+                            vectorRender.push(
+                                <div>
+                                    <h3>{this.state.task[i].name}</h3>
+                                    <p><strong>{this.state.request_user[i].user}</strong>'s request has been validated</p>
+                                </div>
+                            )
+                            /* WITH THE MAP
+                                   {this.state.request_user.map((user) =>
+                                        <div>
+                                            <p> <strong>{user.user}</strong>'s request has been validated</p>
+                                        </div>
+                                    )}
+                             */
+                        } else if (this.state.task[i].name === "request not validated") {
+                            vectorRender.push(
+                                <div>
+                                    <h3>{this.state.task[i].name}</h3>
+                                    <p>The request has not been validated.</p>
+                                    <p><strong>{this.state.request_user[i].user}</strong> will receive an email explaining the reason he
+                                        didn't get the permissions.</p>
+                                </div>
+                            )
+                        }
                         vectorRender.push(
-                            <div>
-                                <h3>{this.state.task[i].name}</h3>
-                                <p><strong>{this.state.request_user[i].user}</strong>'s request has been validated</p>
-                                <input type="submit" value="Confirm" onClick={this.handleConfirmRequest.bind(this)}/>
-                            </div>
-                        )
-                        /* WITH THE MAP
-                               {this.state.request_user.map((user) =>
-                                    <div>
-                                        <p> <strong>{user.user}</strong>'s request has been validated</p>
-                                    </div>
-                                )}
-                         */
-                    } else if (this.state.task[i].name === "request not validated") {
-                        vectorRender.push(
-                            <div>
-                                <h3>{this.state.task[i].name}</h3>
-                                <p>The request has not been validated.</p>
-                                <p><strong>{this.state.request_user[i].user}</strong> will receive an email explaining the reason he
-                                    didn't get the permissions.</p>
-                                <input type="submit" value="Confirm" onClick={this.handleConfirmRequest.bind(this)}/>
-                            </div>
-                        )
+                            <input type="submit" value="Confirm" onClick={this.handleConfirmRequest.bind(this)}/>
+                            )
                     }
                 }
             }
@@ -399,6 +406,7 @@ class GetUserTask extends React.Component{
     handleSignOut = (e) => {
         e.preventDefault()
         this.props.onSignOut(e)
+        window.location.reload()
     }
 
     render() {
@@ -415,7 +423,7 @@ class GetUserTask extends React.Component{
                             <RequestAccess
                                 user={this.props.user}
                                 isAdmin={this.props.isAdmin}
-                                onSignOut={this.props.onSignOut}
+                                onSignOut={this.handleSignOut.bind(this)}
                                 hasRequiredAccess={this.hasRequiredAccess.bind(this)}
                             />
                         </div>
@@ -427,7 +435,7 @@ class GetUserTask extends React.Component{
                             <RequestAccess
                                 user={this.props.user}
                                 isAdmin={this.props.isAdmin}
-                                onSignOut={this.props.onSignOut}
+                                onSignOut={this.handleSignOut.bind(this)}
                                 hasRequiredAccess={this.hasRequiredAccess.bind(this)}
                             />
                         </div>:
@@ -436,11 +444,11 @@ class GetUserTask extends React.Component{
                             </div>
                 }
                     <p>
-                        <input type="submit" value="Sign Out" onClick={this.handleSignOut.bind(this)}/>
+                        <input type="submit" id="signOutBtn" value="Sign Out" onClick={this.handleSignOut.bind(this)}/>
                     </p>
                 </div>
             </div>
-    )
+        )
     }
 }
 
