@@ -40,10 +40,9 @@ public class InsertAppToUserRepository {
 
     @Transactional
     public void deleteRow(AddAppToUser addAppToUser){
-        entityManager.createNativeQuery("DELETE FROM ACT_ID_USER_APP WHERE user = ? AND value = ? AND validated = ?")
+        entityManager.createNativeQuery("DELETE FROM ACT_ID_USER_APP WHERE user = ? AND value = ?")
                 .setParameter(1, addAppToUser.getUser())
                 .setParameter(2, addAppToUser.getValue())
-                .setParameter(3, addAppToUser.getValidation())
                 .executeUpdate();
     }
 }
