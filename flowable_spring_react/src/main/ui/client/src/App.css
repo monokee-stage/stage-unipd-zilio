@@ -20,10 +20,54 @@
   margin-inline: 30px;
 }
 
-.validationRequestTask, .requestAccess, .chooseApplication {
+.requestValidatedDiv{
   box-sizing: content-box;
   width: 500px;
   border: solid medium black;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-inline: 30px;
+}
+
+.requestNotValidatedDiv {
+  box-sizing: content-box;
+  width: 600px;
+  border: solid medium black;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-inline: 30px;
+}
+
+.requestAccess, .chooseApplication{
+  box-sizing: content-box;
+  width: 500px;
+  border: solid medium black;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.requestNotValidatedTask{
+  box-sizing: content-box;
+  width: 600px;
+  border: solid medium black;
+  border-bottom: thin;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.validationRequestTask, .requestValidatedTask {
+  box-sizing: content-box;
+  width: 500px;
+  border: solid medium black;
+  border-bottom: thin;
   display: inline-flex;
   flex-direction: column;
   justify-content: center;
@@ -60,7 +104,18 @@
   display: flow;
 }
 
-#confirmValidationBtn, #signOutBtn, #requestAccessBtn {
+#confirmValidationBtn, #requestAccessBtn2 {
+  margin-top: 10px;
+  width: 200px;
+  height: 40px;
+}
+
+#signOutBtn {
+  width: 200px;
+  height: 40px;
+}
+
+#requestAccessBtn, #appConnectedBtn {
   margin-bottom: 10px;
   margin-top: 10px;
   width: 200px;

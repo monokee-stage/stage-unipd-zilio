@@ -82,10 +82,10 @@ public class AppController {
     }
 
     @GetMapping("/getLastAppUser/{user}")
-    public AppNameUserOnly getLastApp(@PathVariable String user) throws NullPointerException {
+    public AppNameUserOnly getLastApp(@PathVariable String user) throws Exception {
         value = Objects.requireNonNull(appRepository.findUserApps(user).stream().reduce((first, second) -> second).orElse(null)).getValue();
         System.out.println(value);
-        //Process(value, user);
+        Process(value, user);
         return appRepository.findUserApps(user).stream().reduce((first, second) -> second).orElse(null);
     }
 
@@ -327,7 +327,7 @@ public class AppController {
 
             Task taskU = taskService.createTaskQuery().taskUnassigned().active().singleResult();
 
-            if (taskU.getAssignee() == null) {
+            if(taskU != null && taskU.getAssignee() == null) {
                 taskService.setAssignee(taskU.getId(), simpleUser[i]);
                 taskU.setAssignee(simpleUser[i]);
             }

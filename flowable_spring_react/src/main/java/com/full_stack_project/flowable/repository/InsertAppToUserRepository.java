@@ -23,6 +23,7 @@ public class InsertAppToUserRepository {
                 .setParameter(2, addAppToUser.getValue())
                 .setParameter(3, addAppToUser.getValidation())
                 .executeUpdate();
+        System.out.println("inserimento");
     }
 
     @Transactional

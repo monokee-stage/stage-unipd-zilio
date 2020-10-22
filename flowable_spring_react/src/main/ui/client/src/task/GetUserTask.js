@@ -337,24 +337,41 @@ class GetUserTask extends React.Component{
                         <div>
                             <h3>{this.state.task[i].name}</h3>
                             <h4> You have access to the following application: {app} </h4>
-                            <input type="submit" value="Confirm" onClick={this.handleConfirmAppConnected.bind(this)}/>
+                            <input type="submit" value="Confirm" id="appConnectedBtn" onClick={this.handleConfirmAppConnected.bind(this)}/>
                         </div>
                     )
                 }
             }
         }else {
+            console.log(this.state.n_request)
+            console.log(this.state.task)
             if (this.state.n_request > 0) {
                 for (let i = 0; i < this.state.task.length; i++) {
-                    console.log(this.state.task[i].name)
+                    console.log(i + " " + this.state.task[i].name + " " +  this.state.request_user[i].user)
                     if (this.state.task[i].name === "validation request") {
                         vectorRender.push(
                             <div className="validationRequest">
                                 <h3>{this.state.task[i].name}</h3>
-                                {this.state.request_user.map((user, i) =>
+                                <div className="validationRequestTask">
+                                    <p><strong>{this.state.request_user[i].user}</strong> is requiring access to the following app: <strong>{this.state.request_user[i].app}</strong></p>
+                                    <p>Do you validate the request?</p>
+                                    <form id="formRadioButtons">
+                                        <div id="valChoices">
+                                            <input className="inputYes" accessKey={i} name={this.state.request_user[i].app} type="radio" id={this.state.request_user[i].user} value="Yes" checked={this.state.changeStateRadioButton[i] === 'Yes'} onChange={this.handleOptionChange.bind(this)}/>
+                                            <label id="forYes" htmlFor="yes">Yes</label>
+                                            <br/>
+                                            <input className="inputNo" accessKey={i} name={this.state.request_user[i].app} type="radio" id={this.state.request_user[i].user} value="No" checked={this.state.changeStateRadioButton[i] === 'No'} onChange={this.handleOptionChange.bind(this)}/>
+                                            <label id="forNo" htmlFor="no">No</label>
+                                        </div><br/>
+                                    </form>
+                                </div>
+
+                            </div>)
+                        /*
+                        {this.state.request_user.map((user, i) =>
                                     <div className="validationRequestTask">
                                         <p><strong>{user.user}</strong> is requiring access to the following app: <strong>{user.app}</strong></p>
                                         <p>Do you validate the request?</p>
-
                                         <form id="formRadioButtons">
                                             <div id="valChoices">
                                                 <input className="inputYes" accessKey={i} name={user.app} type="radio" id={user.user} value="Yes" checked={this.state.changeStateRadioButton[i] === 'Yes'} onChange={this.handleOptionChange.bind(this)}/>
@@ -366,14 +383,16 @@ class GetUserTask extends React.Component{
                                         </form>
                                     </div>
                                 )}
-                                <input type="submit" id="confirmValidationBtn" value="Confirm" onClick={this.handleFormSubmit.bind(this)}/>
-                            </div>)
+                         */
                     } else {
                         if (this.state.task[i].name === "request validated") {
                             vectorRender.push(
-                                <div>
+                                <div className="requestValidatedDiv">
                                     <h3>{this.state.task[i].name}</h3>
-                                    <p><strong>{this.state.request_user[i].user}</strong>'s request has been validated</p>
+                                    <div className="requestValidatedTask">
+                                        <p><strong>{this.state.request_user[i].user}</strong>'s request has been validated</p>
+                                    </div>
+
                                 </div>
                             )
                             /* WITH THE MAP
@@ -385,19 +404,30 @@ class GetUserTask extends React.Component{
                              */
                         } else if (this.state.task[i].name === "request not validated") {
                             vectorRender.push(
-                                <div>
+                                <div className="requestNotValidatedDiv">
                                     <h3>{this.state.task[i].name}</h3>
+                                    <div className="requestNotValidatedTask">
                                     <p>The request has not been validated.</p>
                                     <p><strong>{this.state.request_user[i].user}</strong> will receive an email explaining the reason he
                                         didn't get the permissions.</p>
+                                    </div>
                                 </div>
                             )
                         }
-                        vectorRender.push(
-                            <input type="submit" value="Confirm" onClick={this.handleConfirmRequest.bind(this)}/>
-                            )
                     }
                 }
+            }
+            let isARequest = false;
+            for(let i=0; i<this.state.task.length; i++){
+                if(this.state.task[i].name === "request validated" || this.state.task[i].name === "request not validated")
+                    isARequest = true;
+                if(this.state.task[i].name === "validation request")
+                    isARequest = false;
+            }
+            if(isARequest === true) {
+                vectorRender.push(<div><input type="submit" value="Confirm" id="requestAccessBtn2" onClick={this.handleConfirmRequest.bind(this)}/></div>)
+            } else {
+                vectorRender.push(<div><input type="submit" id="confirmValidationBtn" value="Confirm" onClick={this.handleFormSubmit.bind(this)}/></div>)
             }
         }
         return vectorRender;

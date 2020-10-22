@@ -40,8 +40,8 @@ class ChooseApp extends Component {
     handleChoice(e) {
         e.preventDefault()
         this.checkApp()
-        /*alert("Task executed.")
-        window.location.reload()*/
+        alert("Task executed.")
+        window.location.reload()
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -86,15 +86,15 @@ class ChooseApp extends Component {
         //if it does not need, i'll just send the app to the DB table
         if(this.state.needValidation === 0) {
             console.log("sono nell'if")
-            this.sendAppToDB(this.state.selectedApp, 1)
+            this.sendAppToDB(this.state.selectedApp, 1).then(r => this.getChoice(this.props.user))
         }else{   //if it needs approval, i need the admin to approve this, so as long as the admin does not login, i can't do anything
             console.log("sono nell'else")
-            this.sendAppToDB(this.state.selectedApp, 0)
+            this.sendAppToDB(this.state.selectedApp, 0).then(r => this.getChoice(this.props.user))
              //waiting for admin approval but i execute the process anyways
         }
         console.log("sono fuori dal controllo if-else")
         //this.forceUpdate()
-        this.getChoice(this.props.user)
+        //this.getChoice(this.props.user)
     }
 
     getChoice = (id) => {
@@ -140,8 +140,8 @@ class ChooseApp extends Component {
         });
     }
 
-    sendAppToDB = (app, validation) => {
-        fetch("http://localhost:8081/api/addApp/" + `${this.props.user}` + "&" + `${app}` + "&" + `${validation}`, {
+    async sendAppToDB (app, validation){
+        let response = await fetch("http://localhost:8081/api/addApp/" + `${this.props.user}` + "&" + `${app}` + "&" + `${validation}`, {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json',
@@ -151,6 +151,7 @@ class ChooseApp extends Component {
         ).then((response) => {
             console.log(response)
         });
+        return 1;
     }
 
     changeSelectedOption = (e) => {
