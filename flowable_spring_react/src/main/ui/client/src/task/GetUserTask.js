@@ -191,7 +191,7 @@ class GetUserTask extends React.Component{
             }
         }
         for(let i=0; i<this.state.request_user.length; i++) {
-            fetch("http://localhost:8081/api/deleteUserApp/" + `${this.state.request_user[i].user}` + "&" + `${app}`, {
+            fetch("http://localhost:8081/api/deleteUserApp/" + `${user}` + "&" + `${app}`, {
                     method: "POST",
                     headers: {
                         'Accept': 'application/json',
