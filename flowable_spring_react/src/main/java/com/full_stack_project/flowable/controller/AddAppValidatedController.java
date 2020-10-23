@@ -33,9 +33,10 @@ public class AddAppValidatedController {
     private AddAppValidatedRepository addAppValidatedRepository;
 
     @PostMapping("/addAppValidated/{username}&{app_name}&{validator}")
-    public void insertAppValidated(@PathVariable String username, @PathVariable String app_name, @PathVariable String validator) throws Exception {
+    public void insertAppValidated(@PathVariable String username, @PathVariable String[] app_name, @PathVariable String validator) throws Exception {
         try {
-            addAppValidatedRepository.insertWithQueryToAppValidated(new AddAppValidated(username, app_name, validator));
+            for(int i=0; i<app_name.length; i++)
+                addAppValidatedRepository.insertWithQueryToAppValidated(new AddAppValidated(username, app_name[i], validator));
         }catch (Exception e){
             e.printStackTrace();
         } finally {

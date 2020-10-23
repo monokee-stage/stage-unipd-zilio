@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface AddAppToUserRepository extends JpaRepository<AddAppToUser, String> {
-    String GET_ALL_REQUEST = "SELECT user,value,validated FROM ACT_ID_USER_APP";
+    String GET_ALL_REQUEST = "SELECT * FROM ACT_ID_USER_APP";
 
     @Query(value = GET_ALL_REQUEST, nativeQuery = true)
     List<AddAppToUser> getAllRequest();

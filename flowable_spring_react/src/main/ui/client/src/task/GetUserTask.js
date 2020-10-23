@@ -142,10 +142,10 @@ class GetUserTask extends React.Component{
 */
     addAppValidatedByAdmin = () => {
         console.log(this.props.user)
-        let app;
+        let app = [];
         for(let i=0; i<this.state.request_user.length; i++){
             if(this.state.request_user[i].user === this.props.user){
-                app = this.state.request_user[i].app;
+                app.push(this.state.request_user[i].app);
             }
         }
         fetch("http://localhost:8081/api/addAppValidated/" + `${this.props.user}` + "&" + `${app}` + "&" + `${this.state.admin}`, {
@@ -161,14 +161,14 @@ class GetUserTask extends React.Component{
     }
 
     deleteRowTable = () => {
-        let app;
+        let app = [];
         for(let i=0; i<this.state.request_user.length; i++){
             if(this.state.request_user[i].user === this.props.user){
-                app = this.state.request_user[i].app;
+                app.push(this.state.request_user[i].app);
             }
         }
         for(let i=0; i<this.state.request_user.length; i++) {
-            fetch("http://localhost:8081/api/deleteUserApp/" + `${this.props.user}` + "&" + `${app}`, {
+            fetch("http://localhost:8081/api/deleteUserApp/" + `${this.props.user}` + "&" + `${app[i]}`, {
                     method: "POST",
                     headers: {
                         'Accept': 'application/json',
@@ -357,17 +357,17 @@ class GetUserTask extends React.Component{
                     )
                 }
                 if (this.state.task[i].name === "app connected") {
-                    let app = null;
+                    let app = [];
                     for(let i=0; i<this.state.request_user.length; i++){
                         if(this.state.request_user[i].user === this.props.user){
-                            app = this.state.request_user[i].app;
+                            app.push(this.state.request_user[i].app);
                         }
                     }
                     vectorRender.push(
                         <div className="appConnectedDiv">
                             <h3>{this.state.task[i].name}</h3>
                             <div className="appConnectedDivTask">
-                                <h4> You have access to the following application: {app} </h4>
+                                <h4> You have access to the following application: {app[i]} </h4>
                             </div>
                         </div>
                     )

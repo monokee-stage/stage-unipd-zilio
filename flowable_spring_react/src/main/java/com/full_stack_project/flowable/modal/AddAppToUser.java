@@ -7,8 +7,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "ACT_ID_USER_APP")
 public class AddAppToUser {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue int id;
     @Column(name = "user")
     private String user;
     @Column(name = "value")
@@ -31,9 +30,8 @@ public class AddAppToUser {
 
     @Override
     public String toString(){
-        return "App [user = " + user + ", value = " + value +  "validation: " + validated + "]";
+        return "App [user = " + user + ", value = " + value +  " validation: " + validated + "]";
     }
-
     public String getUser() { return user;}
     public String getValue() { return value;}
     public int getValidation() { return validated;}
