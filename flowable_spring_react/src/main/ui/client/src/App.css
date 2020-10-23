@@ -31,7 +31,7 @@
   margin-inline: 30px;
 }
 
-.requestNotValidatedDiv {
+.requestNotValidatedDiv, .appConnectedDiv {
   box-sizing: content-box;
   width: 600px;
   border: solid medium black;
@@ -52,7 +52,7 @@
   align-items: center;
 }
 
-.requestNotValidatedTask{
+.requestNotValidatedTask, .appConnectedDivTask {
   box-sizing: content-box;
   width: 600px;
   border: solid medium black;
@@ -63,7 +63,7 @@
   align-items: center;
 }
 
-.validationRequestTask, .requestValidatedTask {
+.validationRequestTask, .requestValidatedTask{
   box-sizing: content-box;
   width: 500px;
   border: solid medium black;

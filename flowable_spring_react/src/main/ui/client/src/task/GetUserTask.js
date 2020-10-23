@@ -185,13 +185,13 @@ class GetUserTask extends React.Component{
         let app;
         for(let i=0; i<this.state.request_user.length; i++){
             console.log(this.state.request_user[i].user)
-            if(this.state.request_user[i].user === user){
+            if(this.state.request_user[i].user === user[i]){
                 app = this.state.request_user[i].app;
                 console.log(app)
             }
         }
         for(let i=0; i<this.state.request_user.length; i++) {
-            fetch("http://localhost:8081/api/deleteUserApp/" + `${user}` + "&" + `${app}`, {
+            fetch("http://localhost:8081/api/deleteUserApp/" + `${user[i]}` + "&" + `${app}`, {
                     method: "POST",
                     headers: {
                         'Accept': 'application/json',
@@ -364,17 +364,27 @@ class GetUserTask extends React.Component{
                         }
                     }
                     vectorRender.push(
-                        <div>
+                        <div className="appConnectedDiv">
                             <h3>{this.state.task[i].name}</h3>
-                            <h4> You have access to the following application: {app} </h4>
-                            <input type="submit" value="Confirm" id="appConnectedBtn" onClick={this.handleConfirmAppConnected.bind(this)}/>
+                            <div className="appConnectedDivTask">
+                                <h4> You have access to the following application: {app} </h4>
+                            </div>
                         </div>
                     )
                 }
             }
+            let appConnected = false;
+            for(let i=0; i<this.state.task.length; i++){
+                if(this.state.task[i].name === "app connected"){
+                    appConnected = true;
+                }
+            }
+            if(appConnected === true)
+                vectorRender.push(<div><input type="submit" value="Confirm" id="appConnectedBtn" onClick={this.handleConfirmAppConnected.bind(this)}/></div>)
         }else {
             console.log(this.state.n_request)
             console.log(this.state.task)
+            console.log(this.state.request_user)
             if (this.state.n_request > 0) {
                 for (let i = 0; i < this.state.task.length; i++) {
                     //console.log(i + " " + this.state.task[i].name + " " +  this.state.request_user[i].user)
@@ -447,7 +457,7 @@ class GetUserTask extends React.Component{
                 }
             }
             let isARequest, requestNotValidated = false;
-            let user = null;
+            let user = [];
             for(let i=0; i<this.state.task.length; i++){
                 if(this.state.task[i].name === "request validated"){
                     isARequest = true;
@@ -458,17 +468,14 @@ class GetUserTask extends React.Component{
                 else if(this.state.task[i].name === "request not validated"){
                     requestNotValidated = true;
                     isARequest = false;
-                    user = this.state.request_user[i].user
+                    user.push(this.state.request_user[i].user)
                 }
             }
             if(isARequest === true && requestNotValidated === false) { //request validated button
-                console.log("if di request validated")
                 vectorRender.push(<div><input type="submit" value="Confirm" id="requestAccessBtn2" onClick={this.handleConfirmRequest.bind(this)}/></div>)
             } else if(isARequest === false && requestNotValidated === false) {  //validation request button
-                console.log("if di validation request")
                 vectorRender.push(<div><input type="submit" id="confirmValidationBtn" value="Confirm" onClick={this.handleFormSubmit.bind(this)}/></div>)
             } else if(isARequest === false && requestNotValidated === true) { //request not validated button
-                console.log("if di request NOT validated" + user)
                 vectorRender.push(<div><input type="submit" id="confirmRequestNotValidatedBtn" value="Confirm" onClick={this.handleRequestNotValidated.bind(this, user)}/></div>)
             }
         }
