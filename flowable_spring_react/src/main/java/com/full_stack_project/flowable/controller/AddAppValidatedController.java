@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import process_engine.src.main.java.ParseFileJson;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 @RestController
@@ -33,8 +34,13 @@ public class AddAppValidatedController {
 
     @PostMapping("/addAppValidated/{username}&{app_name}&{validator}")
     public void insertAppValidated(@PathVariable String username, @PathVariable String app_name, @PathVariable String validator) throws Exception {
-        addAppValidatedRepository.insertWithQueryToAppValidated(new AddAppValidated(username, app_name, validator));
-        AppController appController = new AppController();
-        appController.ProcessRequestUser(username);
+        try {
+            addAppValidatedRepository.insertWithQueryToAppValidated(new AddAppValidated(username, app_name, validator));
+        }catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            AppController appController = new AppController();
+            appController.ProcessRequestUser(username);
+        }
     }
 }
