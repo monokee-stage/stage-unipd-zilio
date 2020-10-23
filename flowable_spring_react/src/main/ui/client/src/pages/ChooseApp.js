@@ -141,7 +141,7 @@ class ChooseApp extends Component {
     }
 
     async sendAppToDB (app, validation){
-        let response = await fetch("http://localhost:8081/api/addApp/" + `${this.props.user}` + "&" + `${app}` + "&" + `${validation}`, {
+        await fetch("http://localhost:8081/api/addApp/" + `${this.props.user}` + "&" + `${app}` + "&" + `${validation}`, {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json',

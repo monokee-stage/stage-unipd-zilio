@@ -104,7 +104,7 @@
   display: flow;
 }
 
-#confirmValidationBtn, #requestAccessBtn2 {
+#confirmValidationBtn, #requestAccessBtn2, #confirmRequestNotValidatedBtn {
   margin-top: 10px;
   width: 200px;
   height: 40px;

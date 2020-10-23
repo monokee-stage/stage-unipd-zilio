@@ -181,6 +181,29 @@ class GetUserTask extends React.Component{
         }
     }
 
+    deleteRowTableAdmin = (user) => {
+        let app;
+        for(let i=0; i<this.state.request_user.length; i++){
+            console.log(this.state.request_user[i].user)
+            if(this.state.request_user[i].user === user){
+                app = this.state.request_user[i].app;
+                console.log(app)
+            }
+        }
+        for(let i=0; i<this.state.request_user.length; i++) {
+            fetch("http://localhost:8081/api/deleteUserApp/" + `${this.state.request_user[i].user}` + "&" + `${app}`, {
+                    method: "POST",
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    }
+                }
+            ).then((response) => {
+                console.log(response)
+            });
+        }
+    }
+
     handleConfirmAppConnected = () => {
         //this.handleEndUser()
         this.addAppValidatedByAdmin()
@@ -307,6 +330,13 @@ class GetUserTask extends React.Component{
         window.location.reload()
     }
 
+    handleRequestNotValidated = (user) => {
+        this.handleConfirmRequest()
+        this.deleteRowTableAdmin(user)
+        /*alert("Task executed.")
+        window.location.reload()*/
+    }
+
     renderTask = () => {
         console.log(this.state.task)
         const vectorRender = []
@@ -347,7 +377,7 @@ class GetUserTask extends React.Component{
             console.log(this.state.task)
             if (this.state.n_request > 0) {
                 for (let i = 0; i < this.state.task.length; i++) {
-                    console.log(i + " " + this.state.task[i].name + " " +  this.state.request_user[i].user)
+                    //console.log(i + " " + this.state.task[i].name + " " +  this.state.request_user[i].user)
                     if (this.state.task[i].name === "validation request") {
                         vectorRender.push(
                             <div className="validationRequest">
@@ -392,7 +422,6 @@ class GetUserTask extends React.Component{
                                     <div className="requestValidatedTask">
                                         <p><strong>{this.state.request_user[i].user}</strong>'s request has been validated</p>
                                     </div>
-
                                 </div>
                             )
                             /* WITH THE MAP
@@ -417,17 +446,30 @@ class GetUserTask extends React.Component{
                     }
                 }
             }
-            let isARequest = false;
+            let isARequest, requestNotValidated = false;
+            let user = null;
             for(let i=0; i<this.state.task.length; i++){
-                if(this.state.task[i].name === "request validated" || this.state.task[i].name === "request not validated")
+                if(this.state.task[i].name === "request validated"){
                     isARequest = true;
-                if(this.state.task[i].name === "validation request")
+                }
+                else if(this.state.task[i].name === "validation request"){
                     isARequest = false;
+                }
+                else if(this.state.task[i].name === "request not validated"){
+                    requestNotValidated = true;
+                    isARequest = false;
+                    user = this.state.request_user[i].user
+                }
             }
-            if(isARequest === true) {
+            if(isARequest === true && requestNotValidated === false) { //request validated button
+                console.log("if di request validated")
                 vectorRender.push(<div><input type="submit" value="Confirm" id="requestAccessBtn2" onClick={this.handleConfirmRequest.bind(this)}/></div>)
-            } else {
+            } else if(isARequest === false && requestNotValidated === false) {  //validation request button
+                console.log("if di validation request")
                 vectorRender.push(<div><input type="submit" id="confirmValidationBtn" value="Confirm" onClick={this.handleFormSubmit.bind(this)}/></div>)
+            } else if(isARequest === false && requestNotValidated === true) { //request not validated button
+                console.log("if di request NOT validated" + user)
+                vectorRender.push(<div><input type="submit" id="confirmRequestNotValidatedBtn" value="Confirm" onClick={this.handleRequestNotValidated.bind(this, user)}/></div>)
             }
         }
         return vectorRender;
